@@ -28,9 +28,6 @@ export const IdentityAuth = () => {
   const [contractAddress, setContractAddress] = useState<string | undefined>(undefined);
   const [isMounted, setIsMounted] = useState<boolean>(false);
   const [rpcError, setRpcError] = useState<string | null>(null);
-  const [encryptedHandle, setEncryptedHandle] = useState<string | null>(null);
-  const [encryptedResultHandle, setEncryptedResultHandle] = useState<string | null>(null);
-  const [decryptedResult, setDecryptedResult] = useState<boolean | null>(null);
   const [currentStep, setCurrentStep] = useState<string>("");
   const [registrationTimestamp, setRegistrationTimestamp] = useState<number | null>(null);
 
@@ -157,7 +154,6 @@ export const IdentityAuth = () => {
     setIsRegistering(true);
     setCurrentStep("encrypting");
     setMessage("Encrypting identity...");
-    setEncryptedHandle(null);
 
     try {
       const signer = await ethersSignerPromise;
@@ -176,7 +172,6 @@ export const IdentityAuth = () => {
       
       // Store encrypted handle for display
       const handleString = Array.from(encrypted.handles[0]).map(b => b.toString(16).padStart(2, '0')).join('');
-      setEncryptedHandle(handleString);
       setMessage(`✓ Encrypted! Handle: ${handleString.slice(0, 20)}...`);
 
       setCurrentStep("registering");
@@ -307,9 +302,6 @@ export const IdentityAuth = () => {
     setIsVerifying(true);
     setCurrentStep("encrypting");
     setMessage("Encrypting identity for verification...");
-    setEncryptedHandle(null);
-    setEncryptedResultHandle(null);
-    setDecryptedResult(null);
 
     try {
       const signer = await ethersSignerPromise;
@@ -326,7 +318,6 @@ export const IdentityAuth = () => {
       input.add32(identityNum);
       const encrypted = await input.encrypt();
       const handleString = Array.from(encrypted.handles[0]).map(b => b.toString(16).padStart(2, '0')).join('');
-      setEncryptedHandle(handleString);
       setMessage(`✓ Step 1 Complete: Encrypted! Handle: ${handleString.slice(0, 20)}...`);
 
       // Step 2: Verify on-chain (FHE comparison)
@@ -360,7 +351,6 @@ export const IdentityAuth = () => {
         encryptedResult = String(verifyResult);
       }
       
-      setEncryptedResultHandle(encryptedResult);
       setMessage(`✓ Step 2 Complete: FHE comparison done! Encrypted result handle: ${encryptedResult.slice(0, 20)}...`);
 
       // Step 3: Decrypt result
@@ -394,7 +384,6 @@ export const IdentityAuth = () => {
       );
 
       const isValid = result[resultHandle] === true;
-      setDecryptedResult(isValid);
       setVerificationResult(isValid);
       setCurrentStep("complete");
       setMessage(isValid 
@@ -518,9 +507,6 @@ export const IdentityAuth = () => {
 
   const primaryBtnClass =
     "group relative inline-flex items-center justify-center rounded-2xl bg-slate-900 px-8 py-4 text-base font-bold text-white shadow-xl transition-all duration-300 hover:bg-slate-800 hover:shadow-slate-200 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none w-full sm:w-auto overflow-hidden";
-
-  const secondaryBtnClass =
-    "group relative inline-flex items-center justify-center rounded-2xl border-2 border-slate-200 bg-white px-8 py-4 text-base font-bold text-slate-900 shadow-sm transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none w-full sm:w-auto";
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-8 pb-12">
